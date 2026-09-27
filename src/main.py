@@ -29,15 +29,20 @@ except Exception as e:
     print(f"Error loading model: {e}")
 
 class ItemInput(BaseModel):
-    daily_sales_avg: float
-    current_stock: float
-    lead_time_days: int
+    product_id: str = "DRG001"
     category: str
     supplier_tier: str
+    daily_sales_avg: float
+    sales_std_dev: float
+    current_stock: float
+    lead_time_days: int
+    reorder_point: float
+    supplier_reliability: float
+    seasonality_factor: float
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Real-Time Drug Demand & Stockout Predictor API. Send a POST request to /predict to get predictions."}
+    return {"message": "Welcome to the Real-Time Drug Demand & Stockout Predictor API."}
 
 @app.post("/predict")
 def predict_stockout(data: ItemInput):
@@ -45,6 +50,10 @@ def predict_stockout(data: ItemInput):
         raise HTTPException(status_code=503, detail="Model not loaded on the server.")
         
     input_df = pd.DataFrame([data.model_dump()])
+    
+    # Drop product_id before passing to model since it wasn't used in training
+    if "product_id" in input_df.columns:
+        input_df = input_df.drop(columns=["product_id"])
     
     try:
         prediction = model.predict(input_df)[0]

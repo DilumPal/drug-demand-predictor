@@ -20,11 +20,23 @@ def train_model():
         
     df = pd.read_csv(data_path)
     
-    X = df.drop(columns=["out_of_stock"])
-    y = df["out_of_stock"]
+    X = df.drop(columns=["out_of_stock_30d", "product_id"])
+    y = df["out_of_stock_30d"]
     
-    num_cols = ["daily_sales_avg", "current_stock", "lead_time_days"]
-    cat_cols = ["category", "supplier_tier"]
+    num_cols = [
+        "daily_sales_avg",
+        "sales_std_dev",
+        "current_stock",
+        "lead_time_days",
+        "reorder_point",
+        "supplier_reliability",
+        "seasonality_factor"
+    ]
+    
+    cat_cols = [
+        "category",
+        "supplier_tier"
+    ]
     
     print("Building preprocessing pipeline...")
     preprocessor = ColumnTransformer(
@@ -56,7 +68,7 @@ def train_model():
     pipeline = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
-            ("classifier", RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, class_weight='balanced')),
+            ("classifier", RandomForestClassifier(n_estimators=100, max_depth=12, random_state=42, class_weight='balanced')),
         ]
     )
     

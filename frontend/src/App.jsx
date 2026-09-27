@@ -3,25 +3,30 @@ import './index.css';
 
 function App() {
   const [formData, setFormData] = useState({
-    daily_sales_avg: 25.2,
-    current_stock: 40,
-    lead_time_days: 10,
-    category: 'Painkiller',
-    supplier_tier: 'B'
+    product_id: 'DRG001',
+    daily_sales_avg: 25.4,
+    sales_std_dev: 5.2,
+    current_stock: 180,
+    lead_time_days: 7,
+    reorder_point: 220,
+    supplier_reliability: 0.94,
+    seasonality_factor: 1.15,
+    category: 'Antibiotic',
+    supplier_tier: 'A'
   });
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const categories = ["Antibiotic", "Painkiller", "Vitamin", "Vaccine", "Antihistamine"];
+  const categories = ["Antibiotic", "Painkiller", "Vitamin", "Vaccine", "Antihistamine", "Diabetes", "Cardiology"];
   const suppliers = ["A", "B", "C", "D"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: (name === 'category' || name === 'supplier_tier') ? value : Number(value)
+      [name]: (name === 'category' || name === 'supplier_tier' || name === 'product_id') ? value : Number(value)
     }));
   };
 
@@ -69,8 +74,8 @@ function App() {
           
           <form onSubmit={handleSubmit} className="form-grid">
             <div className="input-group">
-              <label>Daily Sales Avg</label>
-              <input type="number" step="0.1" name="daily_sales_avg" value={formData.daily_sales_avg} onChange={handleChange} required />
+              <label>Product ID</label>
+              <input type="text" name="product_id" value={formData.product_id} onChange={handleChange} required />
             </div>
 
             <div className="input-group">
@@ -79,8 +84,33 @@ function App() {
             </div>
 
             <div className="input-group">
+              <label>Daily Sales Avg</label>
+              <input type="number" step="0.1" name="daily_sales_avg" value={formData.daily_sales_avg} onChange={handleChange} required />
+            </div>
+
+            <div className="input-group">
+              <label>Sales Std Dev (Volatility)</label>
+              <input type="number" step="0.1" name="sales_std_dev" value={formData.sales_std_dev} onChange={handleChange} required />
+            </div>
+
+            <div className="input-group">
+              <label>Reorder Point</label>
+              <input type="number" step="1" name="reorder_point" value={formData.reorder_point} onChange={handleChange} required />
+            </div>
+
+            <div className="input-group">
+              <label>Seasonality Factor</label>
+              <input type="number" step="0.01" name="seasonality_factor" value={formData.seasonality_factor} onChange={handleChange} required />
+            </div>
+
+            <div className="input-group">
               <label>Lead Time (days)</label>
               <input type="number" name="lead_time_days" value={formData.lead_time_days} onChange={handleChange} required />
+            </div>
+
+            <div className="input-group">
+              <label>Supplier Reliability (0-1)</label>
+              <input type="number" step="0.01" max="1" min="0" name="supplier_reliability" value={formData.supplier_reliability} onChange={handleChange} required />
             </div>
 
             <div className="input-group">
@@ -90,7 +120,7 @@ function App() {
               </select>
             </div>
 
-            <div className="input-group full-width">
+            <div className="input-group">
               <label>Supplier Tier</label>
               <select name="supplier_tier" value={formData.supplier_tier} onChange={handleChange}>
                 {suppliers.map(s => <option key={s} value={s}>Tier {s}</option>)}
